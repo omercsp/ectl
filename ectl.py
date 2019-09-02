@@ -35,6 +35,11 @@ def read_config_file(args):
         raise EctlException("Error parsing {} - '{}'".format(config_path, e))
 
 
+def exec_task(task, error_message, *task_args):
+    if WaitForTask(task(*task_args)) != "success":
+        raise EctlException(error_message)
+
+
 def _determine_setting(arg, config, name):
     if arg is not None:
         return arg
@@ -227,19 +232,19 @@ def find_snap(vm, args):
 
 def snap_create(si, args):
     vm = find_vm(si, args.vm_name)
-    WaitForTask(vm.CreateSnapshot(args.snap, "", False, False))
+    exec_task(vm.CreateSnapshot, "Error creating snapshot", args.snap, "", False, False)
 
 
 def snap_remove(si, args):
     vm = find_vm(si, args.vm_name)
     snap = find_snap(vm, args)
-    WaitForTask(snap.snapshot.RemoveSnapshot_Task(True))
+    exec_task(snap.snapshot.RemoveSnapshot_Task, "Error removing snapshots", True)
 
 
 def snap_revert(si, args):
     vm = find_vm(si, args.vm_name)
     snap = vm.snapshot.currentSnapshot if args.snap is None else find_snap(vm, args).snapshot
-    WaitForTask(snap.RevertToSnapshot_Task())
+    exec_task(snap.RevertToSnapshot_Task, "Error reverting snapshot")
     if args.start:
         vm.PowerOn()
 
