@@ -65,8 +65,8 @@ def esxi_connect(config, args):
         si = SmartConnectNoSSL(host=host, user=user, pwd=pwd)
         atexit.register(Disconnect, si)
         return si
-    except vim.fault.InvalidLogin:
-        raise EctlException("Invalid login details")
+    except vim.fault.InvalidLogin as e:
+        raise EctlException("Invalid login details - '{}'".format(e))
     except Exception as e:
         raise EctlException("Error connecting to ESXi server - '{}'".format(e))
 
