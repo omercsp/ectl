@@ -72,7 +72,7 @@ def esxi_connect(config, args):
 
 
 _MAX_DEPTH = 10
-_VM_PRINT_FMT = "{:<16}{:<30}{:<8}{:<18}"
+_VM_PRINT_FMT = "{:<60}{:<8}{:<18}"
 
 
 # VM level functions and definitions
@@ -95,15 +95,17 @@ def print_vm_info(vm, depth=1):
         power = power[7:]
         if power == "On":
             ip = summary.guest.ipAddress
+    else:
+        power = "n/a"
     if ip is None:
         ip = "n/a"
 
-    print(_VM_PRINT_FMT.format(summary.config.name, summary.config.guestFullName, power, ip))
+    print(_VM_PRINT_FMT.format(summary.config.name, power, ip))
 
 
 def print_vm_list(si):
-    print(_VM_PRINT_FMT.format("Name", "Guest ID", "Power", "IP Address"))
-    print(_VM_PRINT_FMT.format("----", "--------", "-----", "----------"))
+    print(_VM_PRINT_FMT.format("Name", "Power", "IP Address"))
+    print(_VM_PRINT_FMT.format("----", "-----", "----------"))
     content = si.RetrieveContent()
     for child in content.rootFolder.childEntity:
         if hasattr(child, 'vmFolder'):
